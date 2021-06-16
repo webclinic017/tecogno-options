@@ -12,7 +12,7 @@ import traceback
 url = "http://0.0.0.0:5000/"
 
 consumer = KafkaConsumer(
-    'options',
+    'optionst',
      bootstrap_servers='164.52.207.158:9092',
      auto_offset_reset='earliest',
      enable_auto_commit=True,

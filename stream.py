@@ -40,7 +40,7 @@ def on_ticks(ws, ticks):
     print (ticks,"ticks")
     for t in ticks:
         print (t,"kafka sending")
-        producer.send("options",value=t)
+        producer.send("optionst",value=t)
         producer.flush()
 
 def on_connect(ws, response):
