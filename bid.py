@@ -238,6 +238,7 @@ def main():
         else:
             process("stream.py")
             consumer.close()
+            process("bid.py")
 
 
 def get_account():
