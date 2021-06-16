@@ -91,7 +91,7 @@ def get_order_id(username,tradingsymbol=""):
 def place_modify(order_id,username,price):
     order_id = str(int(order_id))
     urlD = url+"/api/order/modify"
-    jsonD = {"order_id":order_id,"username":username,"price":price}
+    jsonD = {"order_id":order_id,"username":username,"trigger_price":price}
     requests.post(urlD,data=json.dumps(jsonD))
     print (order_id,username,price)
     return "done"
@@ -145,7 +145,7 @@ def bring_sl_price(instrument_token,price):
     for i in range(0,len(dfT)):
         order_id = dfT["msg"][i].split("|")[0]
         dfS = get_status_stoploss(order_id)
-        resp = modify_stoploss({"order_id":str(int(float(dfS['order_id'][0]))),"username":dfS['username'][0],"price":price})
+        resp = modify_stoploss({"order_id":str(int(float(dfS['order_id'][0]))),"username":dfS['username'][0],"trigger_price":price})
         print (resp,"resp")
         if resp.get("status") == "Succss":
             # df.loc[df["instrument_token"] == float(instrument_token),"squared"]="true"
