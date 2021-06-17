@@ -123,6 +123,7 @@ def main():
 		Subject = "{}-Options - Success".format(dateT)
 		for m in mailerList:
 			mailer_with_attachment("PFA: Csv",m,Subject,"order.csv")
+		return 1
 	except Exception as e:
 		print(traceback.format_exc(),"First try")
 		print (e)
@@ -132,6 +133,7 @@ def main():
 		for m in mailerList:
 			Subject = "{}-Options Code - Some error occured".format(dateT)
 			mailer("Some error occured Options - {}".format(e),m,Subject)
+		return 0
 
 
 
@@ -141,5 +143,7 @@ def main():
 
 
 # print (get_date_circuit(api_key,access_token,"{}:{}".format("NSE","NIFTY BANK")))
-main()
+flag = main()
+if flag == 0:
+	main()
 # get_inst()

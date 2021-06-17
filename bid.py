@@ -221,7 +221,7 @@ def main():
                         # if True:
                             status,flag = bring_sl_price(instrument_token,slprice)
                             if flag == 0:
-                                jsonR[key2]['Stoploss_trigger_price'] = slprice
+                                jsonR[key1]['Stoploss_trigger_price'] = slprice
                                 jsonR[key1]['trail'] = jsonR[key1]['trail'] + 1
 
                     jsonR[key1]["pnl"] = pnl1
