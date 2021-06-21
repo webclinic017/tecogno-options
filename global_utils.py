@@ -77,14 +77,14 @@ def main():
 		quantityce = dfce['lot_size'][0] * baseQ
 		highce = datace.get("NFO:{}".format(dfce['tradingsymbol'][0])).get("ohlc").get("high")
 		marketce = datace.get("NFO:{}".format(dfce['tradingsymbol'][0])).get("last_price")
-		sLce = myround(highce * 1.50)
+		sLce = myround(marketce * 1.50)
 		dfpe = get_option_df(insdf,"BANKNIFTY","PE",highR)
 		time.sleep(2)
 		datape = get_date_circuit(api_key,access_token,"{}:{}".format("NFO",dfpe["tradingsymbol"][0]))
 		quantitype = dfpe['lot_size'][0] * baseQ
 		highPe = datape.get("NFO:{}".format(dfpe['tradingsymbol'][0])).get("ohlc").get("high")
 		marketpe = datape.get("NFO:{}".format(dfpe['tradingsymbol'][0])).get("last_price")
-		sLpe = myround(highPe * 1.50)
+		sLpe = myround(marketpe * 1.50)
 		jsonR = {}
 		jsonR[dfce["instrument_token"][0]] = {"Stoploss_trigger_price":sLce,"pairorderid":dfpe["instrument_token"][0],"marketprice":marketce,"trail":0}
 		jsonR[dfpe["instrument_token"][0]] = {"Stoploss_trigger_price":sLpe,"pairorderid":dfce["instrument_token"][0],"marketprice":marketpe,"trail":0}

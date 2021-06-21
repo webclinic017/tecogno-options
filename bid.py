@@ -91,7 +91,7 @@ def get_order_id(username,tradingsymbol=""):
 def place_modify(order_id,username,price):
     order_id = str(int(order_id))
     urlD = url+"/api/order/modify"
-    jsonD = {"order_id":order_id,"username":username,"trigger_price":price}
+    jsonD = {"order_id":order_id,"username":username,"price":price}
     requests.post(urlD,data=json.dumps(jsonD))
     print (order_id,username,price)
     return "done"
@@ -174,59 +174,61 @@ def main():
                     last_price = message.get("last_price")
                     key1 = str(float(instrument_token))
                     priceJ = jsonR.get(key1)
-       
-                    marketprice = priceJ.get("marketprice")
-                    pnl1 = marketprice - last_price
-                    squared1 = jsonR[key1].get("squared","")
-                    trail1 = jsonR[key1].get("trail")
-                    print (jsonR[key1],trail1)
-                    pairorderid = priceJ.get("pairorderid")
-                    key2 = str(pairorderid)
-                    pnl2 = jsonR.get(key2).get("pnl",0)
-                    priceM = jsonR.get(key2).get("marketprice",0)
-                    squared2 = jsonR[key2].get("squared","")
+                    if priceJ.get("squared","") != "true":
+                        marketprice = priceJ.get("marketprice")
+                        pnl1 = marketprice - last_price
+                        squared1 = jsonR[key1].get("squared","")
+                        trail1 = jsonR[key1].get("trail")
+                        print (jsonR[key1],trail1)
+                        pairorderid = priceJ.get("pairorderid")
+                        key2 = str(pairorderid)
+                        pnl2 = jsonR.get(key2).get("pnl",0)
+                        priceM = jsonR.get(key2).get("marketprice",0)
+                        squared2 = jsonR[key2].get("squared","")
 
-                    # pnl base out
-                    total = pnl1 + pnl2
-                    # if total > 0 :
-                    if True:
-                        plperc = float(total/(marketprice+priceM))*100
-                        if (plperc >= 40) or (total <= -80):
-                            if len(squared1) == 0:
-                                status,flag = getout(instrument_token)
-                                if (flag == 0):
-                                    jsonR[key1]["squared"] = "true"
-                            if len(squared2) == 0:
-                                status,flag = getout(pairorderid)
-                                if (flag == 0):
-                                    jsonR[key2]["squared"] = "true"
+                        # pnl base out
+                        total = pnl1 + pnl2
+                        # if total > 0 :
+                        if True:
+                            plperc = float(total/(marketprice+priceM))*100
+                            if (plperc >= 40) or (total <= -80):
+                                if len(squared1) == 0:
+                                    status,flag = getout(instrument_token)
+                                    if (flag == 0):
+                                        jsonR[key1]["squared"] = "true"
+                                if len(squared2) == 0:
+                                    status,flag = getout(pairorderid)
+                                    if (flag == 0):
+                                        jsonR[key2]["squared"] = "true"
 
-                    #checkforstoloss hit
-                    Stoploss_trigger_price = jsonR.get(key1).get("Stoploss_trigger_price")
-                    sltoprice = jsonR[key1].get("sltoprice","")
-                    if (last_price > Stoploss_trigger_price) and (len(sltoprice) == 0):
-                        status,flag = bring_sl_price(pairorderid,jsonR[key2]['marketprice'])
-                        if flag == 0:
-                            jsonR[key2]['Stoploss_trigger_price'] = jsonR[key2]['marketprice']
-                            jsonR[key1]['sltoprice'] = "true"
-
-                    individualpnc = float(pnl1/marketprice)* 100
-                    percT = (trail1 + 1) * 10
-                    if individualpnc > percT:
-                    # if True:
-                        slprice = jsonR[key1]['Stoploss_trigger_price']
-                        slprice = slprice - ((percT/200) * marketprice)
-                        slprice = myround(slprice)
-                        if slprice > marketprice:
-                        # if True:
-                            status,flag = bring_sl_price(instrument_token,slprice)
+                        #checkforstoloss hit
+                        Stoploss_trigger_price = jsonR.get(key1).get("Stoploss_trigger_price")
+                        sltoprice = jsonR[key1].get("sltoprice","")
+                        if (last_price > Stoploss_trigger_price) and (len(sltoprice) == 0):
+                            status,flag = bring_sl_price(pairorderid,jsonR[key2]['marketprice'])
                             if flag == 0:
-                                jsonR[key1]['Stoploss_trigger_price'] = slprice
-                                jsonR[key1]['trail'] = jsonR[key1]['trail'] + 1
+                                jsonR[key2]['Stoploss_trigger_price'] = jsonR[key2]['marketprice']
+                                jsonR[key1]['sltoprice'] = "true"
 
-                    jsonR[key1]["pnl"] = pnl1
-                    with open("order.json","w") as wb:
-                        json.dump(jsonR,wb) 
+                        individualpnc = float(pnl1/marketprice)* 100
+                        percT = (trail1 + 1) * 10
+                        if individualpnc > percT:
+                        # if True:
+                            slprice = jsonR[key1]['Stoploss_trigger_price']
+                            slprice = slprice - ((percT/200) * marketprice)
+                            slprice = myround(slprice)
+                            if slprice > marketprice:
+                            # if True:
+                                status,flag = bring_sl_price(instrument_token,slprice)
+                                if flag == 0:
+                                    jsonR[key1]['Stoploss_trigger_price'] = slprice
+                                    jsonR[key1]['trail'] = jsonR[key1]['trail'] + 1
+
+                        jsonR[key1]["pnl"] = pnl1
+                        with open("order.json","w") as wb:
+                            json.dump(jsonR,wb) 
+                    else:
+                        print ("squared",priceJ)
 
             except Exception as e:
             # else:
@@ -238,7 +240,6 @@ def main():
         else:
             process("stream.py")
             consumer.close()
-            process("bid.py")
 
 
 def get_account():
