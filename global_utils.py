@@ -55,7 +55,7 @@ def get_date_circuit(api_key,access_token,listD):
 
 def main():
 	try:
-		baseQ = 10
+		baseQ = 1
 		usernameL = ["ES2479"]
 		df = pd.DataFrame()
 		count = 0
